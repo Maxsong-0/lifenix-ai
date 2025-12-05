@@ -13,13 +13,9 @@ import {
   Globe2,
   Sparkles,
   ListChecks,
-  Brain,
   HeartPulse,
   ChevronLeft,
   ChevronRight,
-  Star,
-  Share,
-  Bookmark,
   Plus,
 } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar" // Added Calendar import
@@ -31,12 +27,10 @@ import { SettingsView } from "@/components/dashboard/settings-view"
 import { AuthView } from "@/components/auth-view"
 import { OnboardingModal } from "@/components/onboarding-modal"
 import { AIAssistant } from "@/components/ai-assistant"
-import SplitText from "@/components/split-text"
 import TextType from "@/components/ui/text-type" // Import TextType
 import AnimatedContent from "@/components/animated-content"
 import GradualBlur from "@/components/gradual-blur"
 import Magnet from "@/components/magnet"
-import ScrollStack, { ScrollStackItem } from "@/components/scroll-stack"
 import FloatingLines from "@/components/floating-lines"
 import { EventDetailsDialog } from "@/components/dashboard/event-details-dialog" // Import EventDetailsDialog
 import { CreateEventDialog } from "@/components/dashboard/create-event-dialog" // Import CreateEventDialog
@@ -412,6 +406,7 @@ export default function LifenixApp() {
             onNavigateToLogin={() => handleNavigateToAuth("login")} // Pass specific handlers
             onNavigateToSignup={() => handleNavigateToAuth("signup")} // Pass specific handlers
             onToggleLanguage={toggleLanguage}
+            language={language} // Pass language prop
           />
         ) : currentView === "auth" ? (
           <AuthView
@@ -448,11 +443,13 @@ function LandingPage({
   onNavigateToLogin, // Updated props
   onNavigateToSignup, // Updated props
   onToggleLanguage,
+  language, // Added language prop
 }: {
   t: (typeof translations)["en"]
   onNavigateToLogin: () => void
   onNavigateToSignup: () => void
   onToggleLanguage: () => void
+  language: LanguageType // Added language type
 }) {
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault()
@@ -463,17 +460,11 @@ function LandingPage({
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.4 }}
-      className="relative min-h-screen bg-slate-950 text-white selection:bg-cyan-500/30"
-    >
+    <div className="min-h-screen bg-slate-950 text-white overflow-x-hidden">
       {/* Fixed background elements for unified look across all sections */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <FloatingLines
-          linesGradient={["#06b6d4", "#8b5cf6", "#3b82f6"]} // Cyan, Purple, Blue to match theme
+          linesGradient={["#06b6d4", "#8b5cf6", "#3b82f6"]}
           enabledWaves={["top", "middle", "bottom"]}
           lineCount={[8, 12, 16]}
           lineDistance={[6, 4, 3]}
@@ -501,209 +492,416 @@ function LandingPage({
         target="page"
       />
 
-      {/* Top Navigation */}
-      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex justify-between rounded-full border border-white/10 bg-slate-950/50 px-6 backdrop-blur-xl shadow-lg shadow-black/20 w-[90%] max-w-5xl py-0 items-center">
-        <div className="flex items-center gap-3">
-          <img src="/images/lifenix-logo.png" alt="Lifenix Logo" className="h-14 w-auto object-contain" />
-          {/* Added the brand name image next to the logo */}
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex justify-between items-center rounded-full border border-white/10 bg-slate-950/70 px-3 md:px-6 backdrop-blur-xl shadow-lg shadow-black/20 w-[95%] md:w-[90%] max-w-5xl h-14 md:h-16">
+        <div className="flex items-center gap-2">
+          <img src="/images/lifenix-logo.png" alt="Lifenix Logo" className="h-8 md:h-10 w-auto object-contain" />
           <img
             src="/images/lifenix-text.png"
             alt="Lifenix AI"
-            className="w-auto object-contain brightness-0 invert h-20"
+            className="hidden sm:block w-auto object-contain brightness-0 invert h-10 md:h-14"
           />
         </div>
-        <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-8 md:flex">
+        <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-6 lg:flex">
           <a
             href="#features"
             onClick={(e) => scrollToSection(e, "features")}
-            className="text-sm font-medium text-slate-300 transition-all duration-200 hover:text-white hover:scale-105"
+            className="text-sm font-medium text-slate-400 transition-all duration-200 hover:text-white"
           >
             {t.navFeatures}
           </a>
           <a
             href="#philosophy"
             onClick={(e) => scrollToSection(e, "philosophy")}
-            className="text-sm font-medium text-slate-300 transition-all duration-200 hover:text-white hover:scale-105"
+            className="text-sm font-medium text-slate-400 transition-all duration-200 hover:text-white"
           >
             {t.navHowItWorks}
           </a>
           <a
             href="#pricing"
             onClick={(e) => scrollToSection(e, "pricing")}
-            className="text-sm font-medium text-slate-300 transition-all duration-200 hover:text-white hover:scale-105"
+            className="text-sm font-medium text-slate-400 transition-all duration-200 hover:text-white"
           >
             {t.navPricing}
           </a>
         </div>
-        <div className="flex items-center gap-4">
-          <AnimatedContent distance={50} direction="horizontal" reverse={false} duration={0.5} scale={0.9}>
-            <button
-              onClick={onToggleLanguage}
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-medium text-white backdrop-blur transition-all duration-300 hover:scale-105 hover:bg-white/20 hover:shadow-lg hover:shadow-cyan-500/20"
-            >
-              <Globe2 className="h-3.5 w-3.5" />
-              <span>{t.languageLabel}</span>
-            </button>
-          </AnimatedContent>
+        <div className="flex items-center gap-2 md:gap-4">
+          <button
+            onClick={onToggleLanguage}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-white/80 backdrop-blur transition-all duration-200 hover:bg-white/10 hover:text-white"
+          >
+            <Globe2 className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{t.languageLabel}</span>
+          </button>
 
-          <AnimatedContent distance={50} direction="horizontal" reverse={false} duration={0.5} delay={0.1} scale={0.9}>
-            <button
-              onClick={onNavigateToLogin}
-              className="hidden md:inline-flex text-sm font-medium text-slate-300 hover:text-white transition-colors"
-            >
-              {t.ctaSecondary}
-            </button>
-          </AnimatedContent>
+          <button
+            onClick={onNavigateToLogin}
+            className="hidden md:inline-flex text-sm font-medium text-slate-400 hover:text-white transition-colors px-3 py-1.5"
+          >
+            {t.ctaSecondary}
+          </button>
 
-          <AnimatedContent distance={50} direction="horizontal" reverse={false} duration={0.5} delay={0.2} scale={0.9}>
-            <Magnet padding={50} magnetStrength={5}>
-              <button
-                onClick={onNavigateToSignup}
-                className="hidden md:inline-flex rounded-full bg-white px-5 py-2 text-sm font-bold text-slate-950 transition-all hover:bg-cyan-50 hover:scale-105"
-              >
-                {t.ctaPrimary}
-              </button>
-            </Magnet>
-          </AnimatedContent>
+          <button
+            onClick={onNavigateToSignup}
+            className="rounded-full bg-white px-4 py-2 text-xs md:text-sm font-semibold text-slate-950 transition-all hover:bg-slate-100"
+          >
+            {t.ctaPrimary}
+          </button>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 pt-20 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="max-w-5xl"
-        >
-          <motion.div
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-            className="mb-6 inline-flex items-center rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1 text-sm font-medium text-cyan-300 backdrop-blur-sm shadow-lg shadow-cyan-500/20"
-          >
-            <Sparkles className="mr-2 h-4 w-4 animate-pulse" />
-            v2.0 Now Available — AI-Powered Life Management
-          </motion.div>
-
-          <h1 className="mb-6 bg-gradient-to-br from-white via-cyan-100 to-purple-200 bg-clip-text text-5xl font-bold leading-tight tracking-tight text-transparent md:text-7xl lg:text-8xl">
-            <TextType
-              text={[t.heroTitle]}
-              typingSpeed={40}
-              className="bg-gradient-to-br from-white via-cyan-100 to-purple-200 bg-clip-text text-transparent"
-              cursorClassName="text-cyan-400" // Added color to cursor so it's visible against transparent text
-              as="span"
-              loop={false} // Usually hero title shouldn't loop typing
-            />
-          </h1>
-
-          <div className="mb-8 max-w-3xl mx-auto text-lg text-slate-300 md:text-2xl leading-relaxed">
-            <SplitText
-              text={t.heroSubtitle}
-              className="text-slate-300"
-              delay={30}
-              duration={0.8}
-              ease="power2.out"
-              splitType="words"
-              from={{ opacity: 0, y: 20 }}
-              to={{ opacity: 1, y: 0 }}
-              threshold={0.1}
-              rootMargin="-50px"
-              textAlign="center"
-            />
-          </div>
-
-          <div className="mb-10 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-2">
-                <div className="h-8 w-8 rounded-full border-2 border-slate-950 bg-gradient-to-br from-purple-400 to-cyan-500" />
-                <div className="h-8 w-8 rounded-full border-2 border-slate-950 bg-gradient-to-br from-blue-400 to-purple-500" />
-                <div className="h-8 w-8 rounded-full border-2 border-slate-950 bg-gradient-to-br from-cyan-400 to-blue-500" />
-              </div>
-              <span className="font-medium text-slate-300">10,000+ active users</span>
-            </div>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Sparkles key={i} className="h-4 w-4 text-yellow-500" />
-              ))}
-              <span className="ml-1 font-medium text-slate-300">4.9/5 rating</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-purple-400" />
-              <span className="font-medium text-slate-300">AI-Powered Insights</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <AnimatedContent distance={100} direction="vertical" duration={0.8} delay={0.2} scale={0.8}>
-              <Magnet padding={100} magnetStrength={5}>
-                <button
-                  onClick={onNavigateToSignup}
-                  className="group relative overflow-hidden rounded-full bg-gradient-to-r from-purple-500 via-cyan-400 to-blue-500 px-8 py-4 text-lg font-bold text-slate-950 shadow-lg shadow-purple-500/40 transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-purple-500/60 hover:-translate-y-1"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    {t.ctaPrimary}
-                    <motion.span
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-                    >
-                      →
-                    </motion.span>
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-400 to-cyan-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </button>
-              </Magnet>
-            </AnimatedContent>
-
-            <AnimatedContent distance={100} direction="vertical" duration={0.8} delay={0.3} scale={0.8}>
-              <button
-                onClick={onNavigateToLogin}
-                className="group rounded-full border border-white/30 bg-white/10 px-8 py-4 text-lg font-semibold text-white backdrop-blur transition-all duration-300 hover:scale-105 hover:border-cyan-400/50 hover:bg-white/20 hover:shadow-lg hover:shadow-cyan-500/30"
-              >
-                <span className="flex items-center gap-2">
-                  {t.ctaSecondary}
-                  <LogOut className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </span>
-              </button>
-            </AnimatedContent>
-          </div>
-
+      <section className="relative z-10 min-h-screen flex flex-col items-center justify-start px-4 sm:px-6 lg:px-8 pt-20 md:pt-24 pb-8">
+        <div className="max-w-5xl mx-auto text-center">
+          {/* Announcement Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm"
+            transition={{ duration: 0.5 }}
+            className="mb-4 md:mb-6"
           >
-            <div className="flex items-center gap-2 text-slate-400">
-              <CheckSquare className="h-5 w-5 text-cyan-400" />
-              <span>No credit card required</span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium text-cyan-300 backdrop-blur-sm">
+              <Sparkles className="h-3.5 w-3.5 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">v2.0 Now Available —</span> AI-Powered Life Management
+            </span>
+          </motion.div>
+
+          {/* Main Headline with TextType effect - reduced margin */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-3 md:mb-4">
+              <TextType
+                text={[t.heroTitle]}
+                typingSpeed={40}
+                className="bg-gradient-to-b from-white via-white to-slate-400 bg-clip-text text-transparent"
+                cursorClassName="text-cyan-400"
+                as="span"
+                loop={false}
+              />
+            </h1>
+          </motion.div>
+
+          {/* Subtitle - reduced margin */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="max-w-2xl mx-auto mb-5 md:mb-6"
+          >
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-slate-400 leading-relaxed">
+              {t.heroSubtitle}
+            </p>
+          </motion.div>
+
+          {/* CTA Buttons - reduced margin */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 md:mb-8"
+          >
+            <button
+              onClick={onNavigateToSignup}
+              className="w-full sm:w-auto group relative overflow-hidden rounded-full bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold text-slate-950 transition-all duration-300 hover:bg-slate-100 hover:scale-[1.02] flex items-center justify-center gap-2"
+            >
+              {t.ctaPrimary}
+              <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}>
+                →
+              </motion.span>
+            </button>
+
+            <button
+              onClick={onNavigateToLogin}
+              className="w-full sm:w-auto rounded-full border border-white/20 bg-white/5 px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-medium text-white backdrop-blur transition-all duration-300 hover:bg-white/10 hover:border-white/30 flex items-center justify-center gap-2"
+            >
+              {t.ctaSecondary}
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </motion.div>
+
+          {/* Trust Indicators - made more compact */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-slate-500 mb-6 md:mb-8"
+          >
+            <div className="flex items-center gap-1.5">
+              <CheckSquare className="h-3.5 w-3.5 text-slate-500" />
+              <span>{language === "en" ? "No credit card required" : "无需信用卡"}</span>
             </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              <CheckSquare className="h-5 w-5 text-purple-400" />
-              <span>Free 14-day trial</span>
+            <div className="flex items-center gap-1.5">
+              <CheckSquare className="h-3.5 w-3.5 text-slate-500" />
+              <span>{language === "en" ? "Free 14-day trial" : "14天免费试用"}</span>
             </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              <CheckSquare className="h-5 w-5 text-blue-400" />
-              <span>Cancel anytime</span>
+            <div className="flex items-center gap-1.5">
+              <CheckSquare className="h-3.5 w-3.5 text-slate-500" />
+              <span>{language === "en" ? "Cancel anytime" : "随时取消"}</span>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
 
-        {/* Scroll Indicator */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-slate-500"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="w-full max-w-5xl mx-auto flex-1 min-h-0"
         >
-          <div className="h-10 w-6 rounded-full border-2 border-slate-500 p-1">
+          {/* Main Dashboard Preview */}
+          <div className="relative h-full">
+            {/* Glow effect */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500/20 via-emerald-500/20 to-cyan-500/20 rounded-2xl blur-2xl opacity-40" />
+
+            {/* Main card */}
+            <div className="relative rounded-xl md:rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900/90 to-slate-950/90 backdrop-blur-xl overflow-hidden shadow-2xl">
+              {/* Window controls */}
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-white/5 bg-slate-900/50">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <div className="px-3 py-0.5 rounded-md bg-slate-800/50 text-xs text-slate-500">
+                    lifenix.ai/dashboard
+                  </div>
+                </div>
+              </div>
+
+              {/* Dashboard content - more compact */}
+              <div className="p-3 md:p-4 lg:p-5">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
+                  {/* Left panel - AI Assistant */}
+                  <div className="lg:col-span-2 space-y-3">
+                    {/* AI Chat Preview */}
+                    <div className="rounded-lg border border-white/5 bg-slate-800/30 p-3 md:p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-400 to-emerald-400 flex items-center justify-center">
+                          <Sparkles className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <span className="text-xs font-medium text-white">
+                          {language === "en" ? "AI Assistant" : "AI 助手"}
+                        </span>
+                        <span className="ml-auto px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px]">
+                          {language === "en" ? "Online" : "在线"}
+                        </span>
+                      </div>
+
+                      {/* Chat messages */}
+                      <div className="space-y-2">
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1 }}
+                          className="flex gap-2"
+                        >
+                          <div className="w-5 h-5 rounded-full bg-slate-700 flex-shrink-0" />
+                          <div className="rounded-xl rounded-tl-sm bg-slate-700/50 px-3 py-2 text-xs text-slate-300 max-w-[85%]">
+                            {language === "en"
+                              ? "Help me plan my week with focus on productivity"
+                              : "帮我规划这周的时间，重点提升效率"}
+                          </div>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1.3 }}
+                          className="flex gap-2 justify-end"
+                        >
+                          <div className="rounded-xl rounded-tr-sm bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 border border-cyan-500/30 px-3 py-2 text-xs text-slate-200 max-w-[85%]">
+                            {language === "en"
+                              ? "I've analyzed your patterns. Here's an optimized schedule..."
+                              : "我已分析了你的习惯模式。这是一份优化后的日程..."}
+                          </div>
+                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-emerald-400 flex-shrink-0" />
+                        </motion.div>
+                      </div>
+                    </div>
+
+                    {/* Stats Row - more compact */}
+                    <div className="grid grid-cols-3 gap-2 md:gap-3">
+                      {[
+                        { label: language === "en" ? "Tasks Done" : "已完成", value: "24", change: "+12%" },
+                        { label: language === "en" ? "Focus Time" : "专注时长", value: "6.5h", change: "+23%" },
+                        { label: language === "en" ? "Streak" : "连续", value: "14", change: "days" },
+                      ].map((stat, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 1.5 + i * 0.1 }}
+                          className="rounded-lg border border-white/5 bg-slate-800/30 p-2 md:p-3"
+                        >
+                          <p className="text-[10px] text-slate-500 mb-0.5">{stat.label}</p>
+                          <div className="flex items-end gap-1">
+                            <span className="text-lg md:text-xl font-bold text-white">{stat.value}</span>
+                            <span className="text-[10px] text-emerald-400 mb-0.5">{stat.change}</span>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right panel - Calendar - more compact */}
+                  <div className="space-y-3">
+                    {/* Mini Calendar */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 1.1 }}
+                      className="rounded-lg border border-white/5 bg-slate-800/30 p-3"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-white">
+                          {language === "en" ? "December 2025" : "2025年12月"}
+                        </span>
+                        <CalendarIcon className="w-3.5 h-3.5 text-slate-500" />
+                      </div>
+
+                      {/* Calendar grid */}
+                      <div className="grid grid-cols-7 gap-0.5 text-center text-[10px]">
+                        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+                          <div key={i} className="text-slate-600 py-0.5">
+                            {d}
+                          </div>
+                        ))}
+                        {Array.from({ length: 35 }, (_, i) => {
+                          const day = i - 1
+                          const isToday = day === 5
+                          const hasEvent = [3, 8, 12, 15, 22].includes(day)
+                          return (
+                            <div
+                              key={i}
+                              className={`py-1 rounded text-[10px] ${
+                                day < 1 || day > 31
+                                  ? "text-transparent"
+                                  : isToday
+                                    ? "bg-cyan-500 text-white font-medium"
+                                    : hasEvent
+                                      ? "bg-emerald-500/20 text-emerald-400"
+                                      : "text-slate-400"
+                              }`}
+                            >
+                              {day > 0 && day <= 31 ? day : ""}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </motion.div>
+
+                    {/* Upcoming Events - more compact */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 1.3 }}
+                      className="rounded-lg border border-white/5 bg-slate-800/30 p-3"
+                    >
+                      <p className="text-xs font-medium text-white mb-2">
+                        {language === "en" ? "Today's Schedule" : "今日日程"}
+                      </p>
+                      <div className="space-y-1.5">
+                        {[
+                          {
+                            time: "09:00",
+                            title: language === "en" ? "Morning Review" : "晨间回顾",
+                            color: "bg-cyan-500",
+                          },
+                          {
+                            time: "11:00",
+                            title: language === "en" ? "Deep Work" : "深度工作",
+                            color: "bg-emerald-500",
+                          },
+                          {
+                            time: "14:00",
+                            title: language === "en" ? "Team Sync" : "团队同步",
+                            color: "bg-purple-500",
+                          },
+                        ].map((event, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <div className={`w-0.5 h-6 rounded-full ${event.color}`} />
+                            <div>
+                              <p className="text-[10px] text-slate-500">{event.time}</p>
+                              <p className="text-xs text-slate-300">{event.title}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating elements - adjusted positions */}
             <motion.div
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-              className="h-2 w-full rounded-full bg-slate-500"
-            />
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.8, duration: 0.8 }}
+              className="hidden lg:block absolute -left-6 top-1/4 rounded-lg border border-white/10 bg-slate-900/90 backdrop-blur-xl p-2 shadow-xl"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center">
+                  <CheckSquare className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400">{language === "en" ? "Goal achieved!" : "目标达成！"}</p>
+                  <p className="text-xs font-medium text-white">+150 XP</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 2, duration: 0.8 }}
+              className="hidden lg:block absolute -right-6 top-1/3 rounded-lg border border-white/10 bg-slate-900/90 backdrop-blur-xl p-2 shadow-xl"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                  <HeartPulse className="w-3 h-3 text-white" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400">{language === "en" ? "Wellness Score" : "健康指数"}</p>
+                  <p className="text-xs font-medium text-white">92/100</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.2, duration: 0.8 }}
+              className="hidden md:block absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-lg border border-white/10 bg-slate-900/90 backdrop-blur-xl px-3 py-1.5 shadow-xl"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <p className="text-xs text-slate-300">
+                  {language === "en" ? "AI analyzing your patterns..." : "AI 正在分析你的效率模式..."}
+                </p>
+                <div className="flex gap-0.5">
+                  <motion.div
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, delay: 0 }}
+                    className="w-1 h-1 rounded-full bg-cyan-400"
+                  />
+                  <motion.div
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, delay: 0.2 }}
+                    className="w-1 h-1 rounded-full bg-cyan-400"
+                  />
+                  <motion.div
+                    animate={{ opacity: [0.3, 1, 0.3] }}
+                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, delay: 0.4 }}
+                    className="w-1 h-1 rounded-full bg-cyan-400"
+                  />
+                </div>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
-      </div>
+      </section>
 
       {/* Features Section */}
       <motion.div
@@ -712,26 +910,26 @@ function LandingPage({
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         id="features"
-        className="relative z-10 px-6 py-32"
+        className="relative z-10 px-4 sm:px-6 lg:px-8 py-20 md:py-32"
       >
         <div className="mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">{t.navFeatures}</h2>
-            <div className="mt-4 h-1 w-20 mx-auto rounded-full bg-gradient-to-r from-purple-500 to-cyan-500" />
+          <div className="mb-12 md:mb-16 text-center">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">{t.navFeatures}</h2>
+            <div className="mt-4 h-1 w-16 md:w-20 mx-auto rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400" />
           </div>
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3">
             <FeatureCard
-              icon={<ListChecks className="h-8 w-8 text-cyan-400" />}
+              icon={<ListChecks className="h-6 w-6 md:h-8 md:w-8 text-cyan-400" />}
               title={t.featureTaskTitle}
               description={t.featureTaskDesc}
             />
             <FeatureCard
-              icon={<CalendarIcon className="h-8 w-8 text-purple-400" />} // Changed Calendar to CalendarIcon
+              icon={<CalendarIcon className="h-6 w-6 md:h-8 md:w-8 text-cyan-400" />}
               title={t.featurePlanTitle}
               description={t.featurePlanDesc}
             />
             <FeatureCard
-              icon={<HeartPulse className="h-8 w-8 text-blue-400" />}
+              icon={<HeartPulse className="h-6 w-6 md:h-8 md:w-8 text-cyan-400" />}
               title={t.featureWellnessTitle}
               description={t.featureWellnessDesc}
             />
@@ -746,14 +944,13 @@ function LandingPage({
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         id="philosophy"
-        className="relative z-10 px-6 py-32"
+        className="relative z-10 px-4 sm:px-6 lg:px-8 py-20 md:py-32"
       >
-        {/* Removed absolute gradient overlay */}
-        <div className="relative mx-auto max-w-4xl text-center">
-          <Sparkles className="mx-auto mb-6 h-12 w-12 text-purple-400" />
-          <h2 className="mb-4 text-3xl font-bold md:text-5xl">{t.philosophyTitle}</h2>
-          <p className="mb-8 text-xl font-medium text-cyan-400">{t.philosophySubtitle}</p>
-          <p className="text-lg leading-relaxed text-slate-300 md:text-xl">{t.philosophyBody}</p>
+        <div className="relative mx-auto max-w-3xl text-center">
+          <Sparkles className="mx-auto mb-4 md:mb-6 h-8 w-8 md:h-12 md:w-12 text-cyan-400" />
+          <h2 className="mb-3 md:mb-4 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">{t.philosophyTitle}</h2>
+          <p className="mb-6 md:mb-8 text-lg md:text-xl font-medium text-cyan-400">{t.philosophySubtitle}</p>
+          <p className="text-base md:text-lg lg:text-xl leading-relaxed text-slate-400">{t.philosophyBody}</p>
         </div>
       </motion.div>
 
@@ -763,11 +960,13 @@ function LandingPage({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 px-6 py-32"
+        className="relative z-10 px-4 sm:px-6 lg:px-8 py-20 md:py-32"
       >
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-16 text-center text-3xl font-bold md:text-4xl">{t.testimonialsTitle}</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+          <h2 className="mb-12 md:mb-16 text-center text-2xl sm:text-3xl md:text-4xl font-bold">
+            {t.testimonialsTitle}
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <TestimonialCard text={t.testim1Text} author={t.testim1Author} delay={0} />
             <TestimonialCard text={t.testim2Text} author={t.testim2Author} delay={0.2} />
             <TestimonialCard text={t.testim3Text} author={t.testim3Author} delay={0.4} />
@@ -775,75 +974,7 @@ function LandingPage({
         </div>
       </motion.div>
 
-      {/* Team Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 px-6 py-32"
-      >
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold md:text-4xl">{t.teamTitle}</h2>
-            <p className="mt-4 text-lg text-slate-400">{t.teamSubtitle}</p>
-          </div>
-
-          <div className="w-full overflow-hidden rounded-3xl border border-white/10 bg-slate-950/50 backdrop-blur-sm pb-40 h-[900px]">
-            <ScrollStack itemDistance={50} itemScale={0.05} itemStackDistance={20} stackPosition="15%" blurAmount={10}>
-              <ScrollStackItem>
-                <TeamCard
-                  name="Chloe Harrison"
-                  role="Product Designer"
-                  image="/images/image.png"
-                  tags={["Figma", "UX Design"]}
-                  rating={4.5}
-                  earned="$15K+"
-                  rate="$80/hr"
-                  gradient="from-pink-500/20 to-purple-500/20"
-                />
-              </ScrollStackItem>
-              <ScrollStackItem>
-                <TeamCard
-                  name="Marcus Chen"
-                  role="Lead Engineer"
-                  image="/diverse-person-portrait.png"
-                  tags={["React", "Node.js"]}
-                  rating={4.9}
-                  earned="$45K+"
-                  rate="$120/hr"
-                  gradient="from-cyan-500/20 to-blue-500/20"
-                />
-              </ScrollStackItem>
-              <ScrollStackItem>
-                <TeamCard
-                  name="Sarah Miller"
-                  role="AI Researcher"
-                  image="/diverse-person-portrait.png"
-                  tags={["Python", "TensorFlow"]}
-                  rating={4.8}
-                  earned="$32K+"
-                  rate="$150/hr"
-                  gradient="from-purple-500/20 to-pink-500/20"
-                />
-              </ScrollStackItem>
-              <ScrollStackItem>
-                <TeamCard
-                  name="David Kim"
-                  role="Product Manager"
-                  image="/diverse-person-portrait.png"
-                  tags={["Strategy", "Agile"]}
-                  rating={4.7}
-                  earned="$28K+"
-                  rate="$95/hr"
-                  gradient="from-blue-500/20 to-cyan-500/20"
-                />
-              </ScrollStackItem>
-            </ScrollStack>
-          </div>
-        </div>
-      </motion.div>
-
+      {/* Pricing Section */}
       <PricingSection t={t} />
 
       {/* FAQ Section */}
@@ -852,10 +983,10 @@ function LandingPage({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 px-6 py-32"
+        className="relative z-10 px-4 sm:px-6 lg:px-8 py-20 md:py-32"
       >
         <div className="mx-auto max-w-3xl">
-          <h2 className="mb-12 text-center text-3xl font-bold md:text-4xl">{t.faqTitle}</h2>
+          <h2 className="mb-12 md:mb-16 text-center text-2xl sm:text-3xl md:text-4xl font-bold">{t.faqTitle}</h2>
           <div className="space-y-6">
             <FaqItem question={t.faqQ1} answer={t.faqA1} />
             <FaqItem question={t.faqQ2} answer={t.faqA2} />
@@ -870,11 +1001,11 @@ function LandingPage({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 px-6 py-32 text-center"
+        className="relative z-10 px-4 sm:px-6 lg:px-8 py-20 md:py-32 text-center"
       >
         <div className="relative mx-auto max-w-3xl">
-          <h2 className="mb-6 text-4xl font-bold md:text-5xl">{t.bottomCtaTitle}</h2>
-          <p className="mb-10 text-lg text-slate-300">{t.bottomCtaDesc}</p>
+          <h2 className="mb-6 text-3xl sm:text-4xl md:text-5xl font-bold">{t.bottomCtaTitle}</h2>
+          <p className="mb-10 text-base sm:text-lg md:text-xl text-slate-400">{t.bottomCtaDesc}</p>
           <AnimatedContent distance={150} direction="vertical" duration={0.8} scale={0.5} threshold={0.5}>
             <Magnet padding={100} magnetStrength={5}>
               <button
@@ -890,13 +1021,13 @@ function LandingPage({
       </motion.div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 bg-slate-950/30 px-6 py-12 pb-32 backdrop-blur-sm">
+      <footer className="relative z-10 border-t border-white/10 bg-slate-950/30 px-4 sm:px-6 lg:px-8 py-12 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-cyan-500" />
             <span className="font-bold text-slate-200">{t.brand}</span>
           </div>
-          <div className="flex gap-8">
+          <div className="flex flex-wrap justify-center gap-6">
             {t.footerLinks.map((link, idx) => (
               <a key={idx} href="#" className="text-sm text-slate-400 transition hover:text-white">
                 {link}
@@ -906,7 +1037,7 @@ function LandingPage({
           <span className="text-xs text-slate-500">© 2025 {t.brand}. All rights reserved.</span>
         </div>
       </footer>
-    </motion.div>
+    </div>
   )
 }
 
@@ -975,12 +1106,12 @@ function PricingSection({ t }: { t: (typeof translations)["en"] }) {
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.8, ease: "easeOut" }}
       id="pricing"
-      className="relative z-10 px-6 py-32"
+      className="relative z-10 px-4 sm:px-6 lg:px-8 py-20 md:py-32"
     >
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl">{t.pricingTitle}</h2>
-          <p className="text-lg text-slate-400">{t.pricingSubtitle}</p>
+          <h2 className="mb-4 text-2xl sm:text-3xl md:text-4xl font-bold">{t.pricingTitle}</h2>
+          <p className="text-base md:text-lg text-slate-400">{t.pricingSubtitle}</p>
 
           <div className="mt-8 flex items-center justify-center gap-4">
             <span className={`text-sm font-medium ${!isYearly ? "text-white" : "text-slate-400"}`}>
@@ -1007,7 +1138,7 @@ function PricingSection({ t }: { t: (typeof translations)["en"] }) {
           </div>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {/* Starter Plan */}
           <PricingCard
             title={t.planFreeTitle}
@@ -1114,93 +1245,6 @@ function PricingCard({
   )
 }
 
-function TeamCard({
-  name,
-  role,
-  image,
-  tags,
-  rating,
-  earned,
-  rate,
-  gradient,
-}: {
-  name: string
-  role: string
-  image: string
-  tags: string[]
-  rating: number
-  earned: string
-  rate: string
-  gradient: string
-}) {
-  return (
-    <div
-      className={`relative h-full w-full overflow-hidden rounded-[40px] bg-white/10 p-8 backdrop-blur-2xl border border-white/20 shadow-2xl`}
-    >
-      {/* Background Gradient - Made gradient stronger and more colorful */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-60 blur-3xl`} />
-
-      <div className="absolute inset-0 bg-white/5 mix-blend-overlay" />
-
-      <div className="relative z-10 flex h-full flex-col">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-white/30 shadow-lg">
-              <img src={image || "/placeholder.svg"} alt={name} className="h-full w-full object-cover" />
-            </div>
-          </div>
-          <button className="rounded-full bg-white/20 p-3 text-white transition hover:bg-white/30 backdrop-blur-md">
-            <Share className="h-6 w-6" />
-          </button>
-        </div>
-
-        <div className="mt-8">
-          <h3 className="text-4xl font-bold text-white tracking-tight">{name}</h3>
-          <p className="text-xl text-slate-200 mt-2 font-medium">{role}</p>
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          {tags.map((tag, i) => (
-            <span
-              key={i}
-              className="rounded-full bg-white/20 px-5 py-2 text-sm font-semibold text-white backdrop-blur-md border border-white/10 shadow-sm"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-auto grid grid-cols-3 gap-6 border-t border-white/20 pt-8">
-          <div>
-            <div className="flex items-center gap-1 text-2xl font-bold text-white">
-              <Star className="h-6 w-6 fill-current text-yellow-400 stroke-yellow-400" />
-              {rating}
-            </div>
-            <div className="text-sm font-medium text-slate-300 mt-1">Rating</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-white">{earned}</div>
-            <div className="text-sm font-medium text-slate-300 mt-1">Earned</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-white">{rate}</div>
-            <div className="text-sm font-medium text-slate-300 mt-1">Rate</div>
-          </div>
-        </div>
-
-        <div className="mt-8 flex items-center gap-4">
-          <button className="flex-1 rounded-full bg-white/20 py-4 text-lg font-bold text-white backdrop-blur-md transition hover:bg-white/30 border border-white/20 shadow-lg">
-            Get in touch
-          </button>
-          <button className="rounded-full bg-white p-4 text-slate-900 transition hover:bg-slate-200 shadow-lg">
-            <Bookmark className="h-6 w-6" />
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // FAQ Item Component
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -1247,33 +1291,18 @@ function DashboardPage({
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
 
+  // State for dialogs and selected event
+  const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false)
+  const [isEditEventDialogOpen, setIsEditEventDialogOpen] = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | undefined>(undefined)
+
+  const [events, setEvents] = useState<CalendarEvent[]>([]) // State for events
   const [calendars, setCalendars] = useState([
     { id: "work", name: "Work", color: "purple" },
     { id: "personal", name: "Personal", color: "cyan" },
     { id: "family", name: "Family", color: "green" },
   ])
   const [isAddCalendarDialogOpen, setIsAddCalendarDialogOpen] = useState(false)
-
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
-  const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false)
-  const [isEditEventDialogOpen, setIsEditEventDialogOpen] = useState(false)
-
-  const [events, setEvents] = useState<CalendarEvent[]>([
-    {
-      id: "1",
-      title: "Deep Work: Strategy",
-      start: new Date(new Date().setHours(10, 0, 0, 0)),
-      end: new Date(new Date().setHours(11, 30, 0, 0)),
-      type: "work",
-    },
-    {
-      id: "2",
-      title: "Team Sync",
-      start: new Date(new Date().setDate(new Date().getDate() + 1)), // Tomorrow
-      end: new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(15, 0, 0, 0)),
-      type: "work",
-    },
-  ])
 
   const handleAddEvent = (newEvent: Omit<CalendarEvent, "id">) => {
     const event: CalendarEvent = {
@@ -1560,7 +1589,7 @@ function DashboardPage({
           setIsEditEventDialogOpen(true)
         }}
         onDelete={handleDeleteEvent}
-        t={t} // Pass t prop </CHANGE>
+        t={t}
       />
 
       <CreateEventDialog
@@ -1579,14 +1608,14 @@ function DashboardPage({
             : null
         }
         calendars={calendars}
-        t={t} // Pass t prop </CHANGE>
+        t={t}
       />
 
       <AddCalendarDialog
         isOpen={isAddCalendarDialogOpen}
         onClose={() => setIsAddCalendarDialogOpen(false)}
         onSave={handleAddCalendar}
-        t={t} // Pass t prop </CHANGE>
+        t={t}
       />
     </motion.div>
   )
